@@ -17,6 +17,28 @@ class KITTIDetection:
 	def __init__(self):
 		pass
 
+class Bbox:
+	"""
+	Methods dealing with bounding boxes
+	"""
+	def __init__(self, x_left=0, y_top=0, x_right=0, y_bottom = 0):
+		self.xl = x_left
+		self.yt = y_top
+		self.xr = x_right
+		self.yb = y_bottom
+
+	def area(self):
+		return (self.xr - self.xl) * (self.yb - self.yt)
+
+	def width(self):
+		return self.xr - self.xl
+
+	def height(self):
+		return self.yb - self.yt
+
+	def get_array(self):
+		return[self.xl, self.yt, self.xr, self.yb]
+
 class KittLabelFormat(object):
 	"""
 	KITTI Object Detection Label Format
@@ -42,34 +64,40 @@ class KittLabelFormat(object):
     for example because they have been too far away from the laser scanner.
     """
 
+    OBJECT_TYPES = {
+    	'bus': KITTIDetection.Bus,
+    	'car': KITTIDetection.Car,
+    	'cyclist': KITTIDetection.Cyclist,
+    	'pedestrian': KITTIDetection.Person,
+    	'people': KITTIDetection.People,
+    	'person': KITTIDetection.Person,
+    	'person_sitting': KITTIDetection.Person_Sitting,
+    	'person_fa': KITTIDetection.Person_fa,
+    	'person?': KITTIDetection.Person_unsure,
+    	'pickup': KITTIDetection.Pickup,
+    	'misc': KITTIDetection.Misc,
+    	'special-vehicle': KITTIDetection.SpecialVehicle,
+    	'tram': KITTIDetection.Tram,
+    	'truck': KITTIDetection.Truck,
+    	'van': KITTIDetection.Van,
+    	'vehicle-with-trailer': KITTIDetection.VehicleWithTrailer
+    }
+
 	def __init__(self):
-		self.type = ''		# Describes the type of object: 'Car', 'Van',
-							# 	'Truck', 'Pedestrian', 'Person_sitting',
-							#	'Cyclist', 'Van', 'Misc', or 'DontCare'
-		self.truncated = -1	# Float from 0 (non-truncated) to 1 (truncated)
-							# where truncated refers to the object leaving
-							# image boundaries
-		self.occluded = -1	# Integer (0,1,2,3) indicating occlusion stat:
-							# 0 = fully visible, 1 = partly occluded
-							# 2 = largely occluded, 3 = unknown
-		self.alpha = 0.0	# Observation angle of object, ranging [-pi..pi]
-		self.x1 = 0.0
-		self.y1 = 0.0
-		self.x2 = 0.0
-		self.y2 = 0.0
-		self.bbox = (x1,y1,x2,y2)	# 2D bounding box of object in the
-									# image (0-based index):
-									# contains left, top, right, bottom
-									# pixel coordinates
-		self.dimensions = (0.0,0.0,0.0)	# 3D object dimensions: height, width,
-										# length (in meters)
-		self.location = (0.0,0.0,0.0)	# 3D object location x,y,z in camera
-										# coordinates (in meters)
-		self.rotation_y = 0.0	# Rotation ry around Y-axis in cameras
-								# coordinates [-pi..pi]
-		self.score - -1.0	# Only for results: Float, indicating confidence
-							# in detection, needed for p/r curves, higher is
-							# better
+		self.type = ''
+		self.truncated = -1
+		self.occlusion = -1
+		self.alpha = 0.0
+		self.height = 0.0
+		self.width = 0.0
+		self.length = 0.0
+		self.locx = 0.0
+		self.locy = 0.0
+		self.locz = 0.0
+		self.roty = 0.0
+		self.bbox = BBox()
+		self.object = KITTIDetection.Dontcare
+		self.score = -1
 
     def set(self, **kwargs):
         for key in kwargs:
